@@ -1,0 +1,34 @@
+Resolving dependencies...
+Downloading packages...
+  material_color_utilities 0.13.0 (0.13.1 available)
+  meta 1.18.3 (1.19.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  vector_math 2.4.0 (2.4.3 available)
+Got dependencies!
+4 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Running Gradle task 'assembleDebug'...                          
+lib/screens/booking_screen.dart:270:69: Error: The '===' operator is not supported.
+                    _selectedRoute = _routes.firstWhere((r) => r.id === val);
+                                                                    ^
+lib/screens/booking_screen.dart:270:69: Error: The string '===' isn't a user-definable operator.
+                    _selectedRoute = _routes.firstWhere((r) => r.id === val);
+                                                                    ^^^
+Target kernel_snapshot_program failed: Exception
+
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileFlutterBuildDebug'.
+> Process 'command '/opt/hostedtoolcache/flutter/stable-3.47.5-x64/flutter/bin/flutter'' finished with non-zero exit value 1
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 9s
+Running Gradle task 'assembleDebug'...                              9.6s
+Gradle task assembleDebug failed with exit code 1
