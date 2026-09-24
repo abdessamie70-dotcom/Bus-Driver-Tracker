@@ -1,0 +1,151 @@
+name: Build Dual Android APKs (Admin & Booking)
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build Admin & Passenger Booking APKs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: false
+
+      - name: Configure Android Scaffold & Dependencies
+        working-directory: ./bus_driver_tracker_app
+        run: |
+          # 1. Backup lib & pubspec
+          cp -r lib /tmp/lib_backup
+          cp pubspec.yaml /tmp/pubspec_backup
+          
+          # 2. Clean & recreate official Android scaffolding
+          rm -rf android
+          flutter create --project-name bus_driver_tracker --platforms=android --org com.souikat.tracker .
+          
+          # 3. Restore application code & dependencies
+          rm -rf lib
+          cp -r /tmp/lib_backup lib
+          cp /tmp/pubspec_backup pubspec.yaml
+          
+          # 4. Accept Android SDK licenses
+          yes | flutter doctor --android-licenses || true
+          
+          # 5. Fetch dependencies
+          flutter pub get
+
+      - name: Build Admin Dashboard APK (لوحة تحكم الإدارة)
+        working-directory: ./bus_driver_tracker_app
+        run: |
+          mkdir -p ../dist-apks
+          echo "Building Admin Dashboard APK..."
+          flutter build apk --debug -t lib/main.dart 2>&1 | tee /tmp/admin_build.log
+          
+          # Search for any generated APK dynamically
+          ADMIN_APK=$(find build -name "*.apk" -type f | head -n 1)
+          if [ -n "$ADMIN_APK" ]; then
+            echo "SUCCESS: Found Admin APK at $ADMIN_APK"
+            cp "$ADMIN_APK" ../dist-apks/Souikat-Admin-Dashboard.apk
+            ls -lh ../dist-apks/Souikat-Admin-Dashboard.apk
+          else
+            echo "ERROR: No APK generated!"
+            exit 1
+          fi
+
+      - name: Build Passenger Booking APK (بوابة حجز المسافرين)
+        working-directory: ./bus_driver_tracker_app
+        run: |
+          # Clean previous build artifacts
+          rm -rf build/app/outputs build/outputs
+          mkdir -p ../dist-apks
+          echo "Building Passenger Booking APK..."
+          flutter build apk --debug -t lib/main_booking.dart 2>&1 | tee /tmp/booking_build.log
+          
+          # Search for any generated APK dynamically
+          BOOKING_APK=$(find build -name "*.apk" -type f | head -n 1)
+          if [ -n "$BOOKING_APK" ]; then
+            echo "SUCCESS: Found Booking APK at $BOOKING_APK"
+            cp "$BOOKING_APK" ../dist-apks/Souikat-Passenger-Booking.apk
+            ls -lh ../dist-apks/Souikat-Passenger-Booking.apk
+          else
+            echo "ERROR: No APK generated!"
+            exit 1
+          fi
+
+      - name: List Generated APK Files
+        run: |
+          ls -lh dist-apks/
+
+      - name: Upload Admin Dashboard APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Souikat-Admin-Dashboard-APK
+          path: dist-apks/Souikat-Admin-Dashboard.apk
+          if-no-files-found: error
+
+      - name: Upload Passenger Booking APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Souikat-Passenger-Booking-APK
+          path: dist-apks/Souikat-Passenger-Booking.apk
+          if-no-files-found: error
+
+      - name: Create GitHub Release with both APKs
+        if: github.ref == 'refs/heads/main'
+        continue-on-error: true
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v2.0-apks-build-${{ github.run_number }}"
+          name: "إصدار تطبيقي أندرويد (APK) #${{ github.run_number }}: لوحة الإدارة وبوابة حجز المسافرين"
+          body: |
+            ### تطبيقات مؤسسة سويقات أبو طالب لنظام أندرويد (Official Android APKs)
+
+            1. **لوحة تحكم الإدارة (Admin Dashboard APK):**
+               - متابعة أسطول الحافلات وسعتها (50 مقعداً).
+               - تسجيل الرحلات اليومية والتقارير الشهرية.
+               - تقويم حضور وأجور السائقين وإدارة الحجوزات.
+               - ملف التثبيت المباشر: `Souikat-Admin-Dashboard.apk`
+
+            2. **بوابة حجز المسافرين (Passenger Booking APK):**
+               - حجز المقاعد والرحلات للزبائن والمواطنين.
+               - خوارزمية التنبيه والتحويل التلقائي عند امتلاء الحافلة.
+               - إصدار تذكرة ركوب إلكترونية مؤكدة.
+               - ملف التثبيت المباشر: `Souikat-Passenger-Booking.apk`
+          files: |
+            dist-apks/Souikat-Admin-Dashboard.apk
+            dist-apks/Souikat-Passenger-Booking.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push Error Logs to Branch On Failure
+        if: failure()
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git checkout -B build-logs
+          mkdir -p ci-logs
+          cp /tmp/*_build.log ci-logs/ 2>/dev/null || true
+          git add -f ci-logs/
+          git commit -m "ci: upload build failure logs [skip ci]" || true
+          git push -f origin build-logs || true

@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام متابعة سائقي الحافلات | مؤسسة سويقات أبو طالب</title>
+  <meta name="description" content="نظام متابعة سائقي الحافلات وأسطول النقل - مؤسسة سويقات أبو طالب">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="سويقات أبو طالب">
+
+  <!-- Tailwind CSS CDN with configuration -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts: Cairo for Arabic, Inter for English -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ============================================================
+       Top Navigation Bar & Header (Android-Optimized)
+       ============================================================ -->
+  <header class="bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white shadow-lg sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between min-h-[4.25rem] py-2 gap-2 sm:gap-4">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div class="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl sm:text-3xl shadow-inner border border-white/20 shrink-0">
+            🚌
+          </div>
+          <div class="min-w-0">
+            <div class="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <h1 class="text-base sm:text-xl lg:text-2xl font-black tracking-tight truncate" data-i18n="appTitle">
+                نظام متابعة سائقي الحافلات
+              </h1>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-black bg-amber-400 text-slate-950 shadow-xs shrink-0">
+                مؤسسة سويقات أبو طالب
+              </span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-blue-200 mt-0.5 truncate hidden sm:block" data-i18n="appSubtitle">
+              مؤسسة سويقات أبو طالب • إدارة الرحلات اليومية والأسطول وحضور السائقين
+            </p>
+          </div>
+        </div>
+
+        <!-- Global Header Actions -->
+        <div class="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          <!-- Booking Portal Button -->
+          <button id="btnOpenBookingModal" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-amber-400 hover:bg-amber-500 active:scale-95 text-slate-950 rounded-xl shadow-sm transition-all" title="بوابة ورابط حجز التذاكر للزبائن">
+            🎫 <span>بوابة الحجز</span>
+          </button>
+
+          <!-- Drivers Management Modal -->
+          <button id="btnManageDrivers" class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 active:scale-95 rounded-xl border border-white/20 transition-all text-white" title="إدارة السائقين">
+            👥 <span>إدارة السائقين</span>
+          </button>
+
+          <!-- Backup / Restore Dropdown Tools -->
+          <button id="btnBackupData" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-white/10 hover:bg-white/20 active:scale-95 rounded-xl border border-white/10 transition-all" title="تحميل نسخة احتياطية" data-i18n="backupData">
+            💾
+          </button>
+          <button id="btnRestoreData" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-semibold bg-white/10 hover:bg-white/20 active:scale-95 rounded-xl border border-white/10 transition-all" title="استرجاع نسخة" data-i18n="restoreData">
+            📂
+          </button>
+          <input type="file" id="fileRestoreInput" accept=".json" class="hidden">
+        </div>
+      </div>
+
+      <!-- Desktop Tabs Navigation Bar -->
+      <nav class="hidden md:flex items-center gap-1 overflow-x-auto py-2 border-t border-blue-700/50">
+        <button class="nav-tab-btn active" data-tab="dashboard">
+          <span>📊</span>
+          <span data-i18n="navDashboard">لوحة التحكم</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="trips">
+          <span>📋</span>
+          <span data-i18n="navTrips">سجل الرحلات اليومية</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="attendance">
+          <span>📅</span>
+          <span data-i18n="navAttendance">حضور وأجور السائقين</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="fleet">
+          <span>👥</span>
+          <span data-i18n="navFleet">السائقون والأسطول</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="bookings">
+          <span>🎫</span>
+          <span>الحجوزات والتذاكر</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="reports">
+          <span>📈</span>
+          <span data-i18n="navReports">التقارير الشهرية وإكسل</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       Main Content Container
+       ============================================================ -->
+  <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 w-full flex-1 no-print pb-28 md:pb-8">
+
+    <!-- ============================================================
+         TAB 1: Analytics Dashboard & 50-Seater Large Buses Overview
+         ============================================================ -->
+    <div id="tab-dashboard" class="tab-content space-y-6">
+      
+      <!-- Top Fleet KPI Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Card 1: Total Trips -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="statTotalTrips">إجمالي الرحلات</span>
+            <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg font-bold">🚍</div>
+          </div>
+          <p class="text-3xl font-black text-slate-900 mt-2" id="dashTotalTrips">0</p>
+          <span class="text-xs text-slate-500 mt-1 block">الشهر الحالي</span>
+        </div>
+
+        <!-- Card 2: Active Drivers -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="statActiveDrivers">السائقون النشطون</span>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">👥</div>
+          </div>
+          <p class="text-3xl font-black text-slate-900 mt-2" id="dashActiveDrivers">0</p>
+          <span class="text-xs text-slate-500 mt-1 block">في جدول الخدمة</span>
+        </div>
+
+        <!-- Card 3: Revenue -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="statMonthlyRevenue">إجمالي الإيرادات</span>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg font-bold">💰</div>
+          </div>
+          <p class="text-2xl font-black text-emerald-600 mt-2" id="dashRevenue">0 دج</p>
+          <span class="text-xs text-slate-500 mt-1 block">مداخيل التذاكر</span>
+        </div>
+
+        <!-- Card 4: Fuel Costs -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="statFuelCosts">تكاليف الوقود</span>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg font-bold">⛽</div>
+          </div>
+          <p class="text-2xl font-black text-amber-600 mt-2" id="dashFuel">0 دج</p>
+          <span class="text-xs text-slate-500 mt-1 block">مصاريف التشغيل</span>
+        </div>
+
+        <!-- Card 5: Net Balance -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider" data-i18n="statNetBalance">الصافي التشغيلي</span>
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg font-bold">📈</div>
+          </div>
+          <p class="text-2xl font-black text-blue-700 mt-2" id="dashNet">0 دج</p>
+          <span class="text-xs text-slate-500 mt-1 block">الإيراد - الوقود</span>
+        </div>
+      </div>
+
+      <!-- ============================================================
+           DEDICATED SECTION: 50-Seater Large Buses Analytics
+           ============================================================ -->
+      <div class="bg-gradient-to-br from-blue-900 to-indigo-950 rounded-2xl text-white p-6 shadow-xl border border-blue-800">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-blue-800/80">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🌟</span>
+              <h2 class="text-lg sm:text-xl font-black" data-i18n="largeBusTitle">
+                إحصائيات حافلات النقل الكبيرة (سعة 50 راكب)
+              </h2>
+            </div>
+            <p class="text-xs sm:text-sm text-blue-200 mt-1" data-i18n="largeBusSubtitle">
+              تحليل كفاءة الإشغال ونسب الامتلاء للحافلات الكبيرة ومردودية المقاعد
+            </p>
+          </div>
+          <button id="btnDashAddTrip" class="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            <span>➕</span>
+            <span data-i18n="logNewTrip">تسجيل رحلة جديدة</span>
+          </button>
+        </div>
+
+        <!-- 50-Seater Metrics Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 mt-6">
+          <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
+            <span class="text-xs text-blue-200 block" data-i18n="stat50SeaterCount">عدد حافلات 50 مقعد</span>
+            <span class="text-2xl sm:text-3xl font-black text-white mt-1 block" id="dash50Count">0</span>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
+            <span class="text-xs text-blue-200 block" data-i18n="stat50SeaterTrips">رحلات حافلات 50 مقعد</span>
+            <span class="text-2xl sm:text-3xl font-black text-white mt-1 block" id="dash50Trips">0</span>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
+            <span class="text-xs text-blue-200 block" data-i18n="stat50SeaterPassengers">ركاب الحافلات الكبيرة</span>
+            <span class="text-2xl sm:text-3xl font-black text-white mt-1 block" id="dash50Passengers">0</span>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10">
+            <span class="text-xs text-blue-200 block" data-i18n="stat50SeaterOccupancy">معدل الإشغال للحافلات الكبيرة</span>
+            <span class="text-2xl sm:text-3xl font-black text-amber-400 mt-1 block" id="dash50Occupancy">0%</span>
+          </div>
+
+          <div class="bg-white/10 backdrop-blur-sm p-4 rounded-xl border border-white/10 col-span-2 sm:col-span-1">
+            <span class="text-xs text-blue-200 block" data-i18n="stat50SeaterEfficiency">متوسط الركاب/رحلة</span>
+            <span class="text-2xl sm:text-3xl font-black text-emerald-400 mt-1 block" id="dash50Efficiency">0</span>
+          </div>
+        </div>
+
+        <!-- Dynamic Capacity Utilization Bar -->
+        <div class="mt-5 bg-white/10 p-4 rounded-xl border border-white/10">
+          <div class="flex items-center justify-between text-xs text-blue-200 mb-2 font-medium">
+            <span>مقياس استغلال المقاعد للحافلات الكبيرة (سعة 50 راكب):</span>
+            <span class="font-bold text-white">الهدف: &ge; 80% امتلاء</span>
+          </div>
+          <div class="w-full h-3 bg-blue-950/80 rounded-full overflow-hidden p-0.5 border border-white/20">
+            <div id="dash50MeterFill" class="occupancy-meter-fill bg-emerald-400 h-full rounded-full transition-all duration-500" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Operations Split: Recent Trips & Top Drivers -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left: Recent Trips Log Preview (2 cols) -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <span>🕒</span>
+              <span>آخر الرحلات المسجلة</span>
+            </h3>
+            <button onclick="switchTab('trips')" class="text-xs font-bold text-blue-600 hover:text-blue-800">
+              عرض كل الرحلات &larr;
+            </button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-right text-xs">
+              <thead>
+                <tr class="border-b border-slate-200 text-slate-500 font-bold">
+                  <th class="py-2.5 px-3">التاريخ</th>
+                  <th class="py-2.5 px-3">السائق</th>
+                  <th class="py-2.5 px-3">الحافلة</th>
+                  <th class="py-2.5 px-3">المسار</th>
+                  <th class="py-2.5 px-3 text-center">الركاب</th>
+                  <th class="py-2.5 px-3">الإيراد</th>
+                </tr>
+              </thead>
+              <tbody id="dashRecentTripsTableBody">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: Top Performing Drivers (1 col) -->
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+              <span>🏆</span>
+              <span>نشاط السائقين هذا الشهر</span>
+            </h3>
+          </div>
+          <div id="dashTopDriversList" class="space-y-2.5">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 2: Daily Trip Logs & Management
+         ============================================================ -->
+    <div id="tab-trips" class="tab-content hidden space-y-5">
+      
+      <!-- Top Actions & Filter Bar -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h2 class="text-xl font-black text-slate-900" data-i18n="tripsTableTitle">
+              سجل الرحلات اليومية والعمليات
+            </h2>
+            <p class="text-xs text-slate-500 mt-0.5">
+              تسجيل وتعديل وحساب رحلات الحافلات اليومية مع حساب الإشغال وتكاليف الوقود
+            </p>
+          </div>
+          <button id="btnOpenAddTripModal" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            <span>➕</span>
+            <span data-i18n="logNewTrip">تسجيل رحلة جديدة</span>
+          </button>
+        </div>
+
+        <!-- Filter Controls Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-slate-100">
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">بحث سريع:</label>
+            <input type="text" id="filterTripSearch" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="بحث بالسائق، المسار، أو الحافلة..." data-i18n-placeholder="filterSearchPlaceholder">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">السائق:</label>
+            <select id="filterTripDriver" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">نوع الحافلة:</label>
+            <select id="filterTripBusType" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="all" data-i18n="filterAllBuses">جميع الحافلات</option>
+              <option value="50_only" data-i18n="filter50Only">حافلات 50 مقعد فقط</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">حالة الرحلة:</label>
+            <select id="filterTripStatus" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="all" data-i18n="filterAllStatus">جميع الحالات</option>
+              <option value="completed" data-i18n="statusCompleted">مكتملة</option>
+              <option value="in_progress" data-i18n="statusInProgress">جارية الآن</option>
+              <option value="scheduled" data-i18n="statusScheduled">مجدولة</option>
+              <option value="canceled" data-i18n="statusCanceled">ملغاة</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trips Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-3" data-i18n="colDate">التاريخ</th>
+                <th class="py-3 px-3" data-i18n="colDriver">اسم السائق</th>
+                <th class="py-3 px-3" data-i18n="colBus">رقم الحافلة</th>
+                <th class="py-3 px-3" data-i18n="colRoute">المسار / الخط</th>
+                <th class="py-3 px-3 text-center" data-i18n="colPassengers">الركاب</th>
+                <th class="py-3 px-3 text-center" data-i18n="colCapacity">نسبة الإشغال</th>
+                <th class="py-3 px-3" data-i18n="colFuel">الوقود (دج)</th>
+                <th class="py-3 px-3" data-i18n="colRevenue">الإيراد (دج)</th>
+                <th class="py-3 px-3 text-center" data-i18n="colStatus">الحالة</th>
+                <th class="py-3 px-3 text-center" data-i18n="colActions">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="tripsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Dynamic Totals Summary Bar at Bottom -->
+        <div class="bg-slate-900 text-white p-4 flex flex-wrap items-center justify-between gap-4 text-xs font-semibold">
+          <div class="flex items-center gap-6 flex-wrap">
+            <div>
+              <span class="text-slate-400" data-i18n="totalFilteredTrips">مجموع الرحلات:</span>
+              <span class="text-white font-bold font-mono text-sm ms-1" id="summaryFilterTripsCount">0</span>
+            </div>
+            <div>
+              <span class="text-slate-400" data-i18n="totalFilteredPassengers">إجمالي الركاب:</span>
+              <span class="text-white font-bold font-mono text-sm ms-1" id="summaryFilterPassengers">0</span>
+            </div>
+            <div>
+              <span class="text-slate-400" data-i18n="averageOccupancy">متوسط الإشغال:</span>
+              <span class="text-amber-400 font-bold font-mono text-sm ms-1" id="summaryFilterOccupancy">0%</span>
+            </div>
+            <div>
+              <span class="text-slate-400" data-i18n="totalFilteredFuel">إجمالي الوقود:</span>
+              <span class="text-rose-400 font-bold font-mono text-sm ms-1" id="summaryFilterFuel">0 دج</span>
+            </div>
+            <div>
+              <span class="text-slate-400" data-i18n="totalFilteredRevenue">إجمالي الإيرادات:</span>
+              <span class="text-emerald-400 font-bold font-mono text-sm ms-1" id="summaryFilterRevenue">0 دج</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 3: Monthly Summary & Excel Reports
+         ============================================================ -->
+    <div id="tab-reports" class="tab-content hidden space-y-6">
+      
+      <!-- Month Navigation & Excel Download Actions -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-black text-slate-900" data-i18n="reportsTitle">
+            التقرير المالي والتشغيلي المجمّع للسائقين
+          </h2>
+          <p class="text-xs text-slate-500 mt-0.5" data-i18n="reportsSubtitle">
+            جدول شامل بنمط Excel لحساب إنتاجية كل سائق وحصيلة الشهر
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3 flex-wrap">
+          <!-- Month Selector -->
+          <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-300">
+            <button id="btnPrevMonthReport" class="px-2.5 py-1 text-slate-600 hover:text-blue-700 font-bold">◀</button>
+            <span id="reportMonthYearLabel" class="px-3 font-bold text-sm text-slate-800 font-mono">--</span>
+            <button id="btnNextMonthReport" class="px-2.5 py-1 text-slate-600 hover:text-blue-700 font-bold">▶</button>
+          </div>
+
+          <!-- Download Excel CSV Button -->
+          <button id="btnExportReportCSV" class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            <span>📥</span>
+            <span data-i18n="exportReportBtn">تنزيل كشف الشهر كملف Excel (CSV)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Excel-Style Aggregation Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border-b border-slate-300">
+                <th class="py-3 px-3" data-i18n="colDriverName">اسم السائق</th>
+                <th class="py-3 px-3" data-i18n="colBusAssigned">الحافلة المسندة</th>
+                <th class="py-3 px-3 text-center" data-i18n="colWorkDays">أيام العمل</th>
+                <th class="py-3 px-3 text-center" data-i18n="colTripsCount">عدد الرحلات</th>
+                <th class="py-3 px-3 text-center" data-i18n="colTotalPassengers">إجمالي الركاب</th>
+                <th class="py-3 px-3" data-i18n="colTotalFuel">مصاريف الوقود</th>
+                <th class="py-3 px-3" data-i18n="colDriverWage">أجور ومستحقات السائق</th>
+                <th class="py-3 px-3" data-i18n="colGrossRevenue">الإيراد الإجمالي</th>
+                <th class="py-3 px-3" data-i18n="colNetProfit">صافي أرباح المؤسسة</th>
+              </tr>
+            </thead>
+            <tbody id="monthlyReportsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+            <tfoot>
+              <tr class="bg-slate-900 text-white font-bold text-xs border-t-2 border-slate-800">
+                <td class="py-3.5 px-3" colspan="2" data-i18n="tableFleetTotal">المجموع الكلي للأسطول</td>
+                <td class="py-3.5 px-3 text-center text-slate-400">-</td>
+                <td class="py-3.5 px-3 text-center font-mono text-sm text-blue-300" id="reportTotalTrips">0</td>
+                <td class="py-3.5 px-3 text-center font-mono text-sm" id="reportTotalPassengers">0</td>
+                <td class="py-3.5 px-3 font-mono text-rose-400" id="reportTotalFuel">0 دج</td>
+                <td class="py-3.5 px-3 font-mono text-amber-400" id="reportTotalWages">0 دج</td>
+                <td class="py-3.5 px-3 font-mono text-emerald-400 text-sm" id="reportTotalRevenue">0 دج</td>
+                <td class="py-3.5 px-3 font-mono text-blue-400 text-sm" id="reportTotalNet">0 دج</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 4: Attendance & Driver Payroll Calendar
+         ============================================================ -->
+    <div id="tab-attendance" class="tab-content hidden space-y-6">
+      
+      <!-- Control Panel -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          <!-- Driver Selector -->
+          <div class="flex items-center gap-3">
+            <label for="driverSelect" class="text-xs font-bold text-slate-600 whitespace-nowrap" data-i18n="selectDriver">السائق الحالي:</label>
+            <div class="flex items-center gap-2">
+              <select id="driverSelect" class="px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"></select>
+              <button id="btnQuickAddDriver" class="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm font-bold" title="إضافة سائق جديد">➕</button>
+            </div>
+          </div>
+
+          <!-- Month Selector -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-600" data-i18n="selectMonthYear">الشهر والسنة:</span>
+            <div class="flex items-center bg-slate-100 rounded-xl p-1 border border-slate-300">
+              <button id="btnPrevMonth" class="px-2.5 py-1 text-slate-600 hover:text-blue-700 font-bold">◀</button>
+              <span id="currentMonthYearLabel" class="px-3 font-bold text-sm text-slate-800 font-mono">--</span>
+              <button id="btnNextMonth" class="px-2.5 py-1 text-slate-600 hover:text-blue-700 font-bold">▶</button>
+              <button id="btnToday" class="ms-1 px-2.5 py-1 bg-white shadow-xs rounded text-xs font-bold text-slate-700">اليوم</button>
+            </div>
+          </div>
+
+          <!-- Quick Tools -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <button id="btnQuickFillModal" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-lg transition-all" data-i18n="quickFill">⚡ ملء تلقائي</button>
+            <button id="btnPrintReport" class="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all" data-i18n="printReport">🖨️ طباعة كشف الشهر (PDF)</button>
+            <button id="btnResetMonth" class="px-3 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold rounded-lg transition-all" data-i18n="resetMonth">🔄 تفريغ</button>
+          </div>
+        </div>
+
+        <!-- Driver Finance Bar -->
+        <div class="flex items-center justify-between p-3 bg-blue-50/70 border border-blue-100 rounded-xl text-xs flex-wrap gap-3">
+          <div class="flex items-center gap-6 flex-wrap">
+            <div>
+              <span class="text-slate-500">رقم الحافلة:</span>
+              <strong class="text-slate-800 ms-1" id="dispBusNumber">-</strong>
+            </div>
+            <div>
+              <span class="text-slate-500">أجر اليومية:</span>
+              <strong class="text-slate-800 ms-1"><span id="dispDailyWage">0</span> دج</strong>
+            </div>
+            <div>
+              <span class="text-slate-500">أجر الساعة الإضافية:</span>
+              <strong class="text-slate-800 ms-1"><span id="dispOvertimeRate">0</span> دج</strong>
+            </div>
+          </div>
+          <button id="btnEditCurrentDriverFinance" class="text-blue-700 font-bold hover:underline">⚙️ تعديل بيانات السائق</button>
+        </div>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs">
+          <span class="text-xl block">🟢</span>
+          <span class="text-2xl font-black text-slate-800 block mt-1" id="statWorkDays">0</span>
+          <span class="text-xs text-slate-500 font-bold" data-i18n="daysCount">أيام العمل</span>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs">
+          <span class="text-xl block">🔵</span>
+          <span class="text-2xl font-black text-slate-800 block mt-1" id="statRestDays">0</span>
+          <span class="text-xs text-slate-500 font-bold" data-i18n="restCount">أيام الراحة</span>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs">
+          <span class="text-xl block">🔴</span>
+          <span class="text-2xl font-black text-slate-800 block mt-1" id="statAbsenceDays">0</span>
+          <span class="text-xs text-slate-500 font-bold" data-i18n="absentCount">أيام الغياب</span>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs">
+          <span class="text-xl block">🟠</span>
+          <span class="text-2xl font-black text-slate-800 block mt-1" id="statLeaveDays">0</span>
+          <span class="text-xs text-slate-500 font-bold">إجازات</span>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs">
+          <span class="text-xl block">🟣</span>
+          <span class="text-2xl font-black text-purple-700 block mt-1" id="statOvertimeCount">0</span>
+          <span class="text-xs text-slate-500 font-bold" data-i18n="overtimeHours">ساعات إضافية</span>
+        </div>
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 text-center shadow-xs col-span-2 sm:col-span-1">
+          <span class="text-xl block">💰</span>
+          <span class="text-2xl font-black text-emerald-600 block mt-1"><span id="statTotalSalary">0</span> <small class="text-xs">دج</small></span>
+          <span class="text-xs text-slate-500 font-bold" data-i18n="netWages">صافي الأجر</span>
+        </div>
+      </div>
+
+      <!-- Calendar Section -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+          <h2 class="text-lg font-bold text-slate-800" id="calendarTitle">جدول حضور شهر</h2>
+          <div class="flex items-center gap-3 flex-wrap text-xs font-semibold">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-emerald-500"></span> عمل (حاضر)</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-blue-500"></span> راحة أسبوعية</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-rose-500"></span> غياب</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-amber-500"></span> إجازة</span>
+          </div>
+        </div>
+
+        <div class="text-xs text-slate-500">💡 اضغط على اليوم للتبديل السريع للحالة، أو اضغط على أيقونة القلم ✏️ لتسجيل الساعات الإضافية وملاحظات اليوم.</div>
+
+        <!-- Weekdays Header -->
+        <div class="calendar-weekdays">
+          <div>السبت</div>
+          <div>الأحد</div>
+          <div>الإثنين</div>
+          <div>الثلاثاء</div>
+          <div>الأربعاء</div>
+          <div>الخميس</div>
+          <div>الجمعة</div>
+        </div>
+
+        <!-- Days Grid -->
+        <div class="calendar-grid" id="calendarGrid"></div>
+      </div>
+
+      <!-- Finance Calculation Details -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+        <h3 class="font-bold text-slate-800 text-base mb-4">🧾 الحساب المالي والتسوية الشهرية للسائق</h3>
+        <div class="space-y-3 text-sm max-w-xl">
+          <div class="flex justify-between items-center py-1 border-b border-slate-100">
+            <span class="text-slate-600">أجر أيام العمل الأساسية (<span id="calcWorkDaysNum">0</span> يوم × <span id="calcDailyWageVal">0</span>):</span>
+            <strong class="font-mono text-slate-900" id="calcBaseSalary">0 دج</strong>
+          </div>
+          <div class="flex justify-between items-center py-1 border-b border-slate-100">
+            <span class="text-slate-600">أجر الساعات الإضافية (<span id="calcOvertimeNum">0</span> س × <span id="calcOvertimeRateVal">0</span>):</span>
+            <strong class="font-mono text-purple-700" id="calcOvertimeTotal">0 دج</strong>
+          </div>
+          <div class="flex justify-between items-center py-1 border-b border-slate-100">
+            <label for="inputBonus" class="text-slate-600">مكافآت أو بدلات إضافية:</label>
+            <input type="number" id="inputBonus" class="w-32 px-2.5 py-1 text-right text-sm border border-slate-300 rounded font-mono" min="0" value="0">
+          </div>
+          <div class="flex justify-between items-center py-1 border-b border-slate-100">
+            <label for="inputDeduction" class="text-slate-600">خصومات أو سلفات مالية:</label>
+            <input type="number" id="inputDeduction" class="w-32 px-2.5 py-1 text-right text-sm border border-slate-300 rounded font-mono" min="0" value="0">
+          </div>
+          <div class="flex justify-between items-center pt-2 text-base font-black">
+            <span class="text-slate-900">إجمالي المستحق الصافي للسائق:</span>
+            <span class="text-emerald-600 font-mono text-lg" id="calcNetTotal">0 دج</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 5: Fleet & Drivers Management
+         ============================================================ -->
+    <div id="tab-fleet" class="tab-content hidden space-y-6">
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-black text-slate-900" data-i18n="navFleet">السائقون والأسطول</h2>
+          <p class="text-xs text-slate-500 mt-0.5">إدارة بيانات السائقين، أرقام الحافلات، السعة، والأجور اليومية</p>
+        </div>
+        <button id="btnFleetAddDriver" class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+          <span>➕</span>
+          <span data-i18n="addNewDriver">إضافة سائق جديد</span>
+        </button>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-3">اسم السائق</th>
+                <th class="py-3 px-3 text-center">الحالة</th>
+                <th class="py-3 px-3">الحافلة والسعة</th>
+                <th class="py-3 px-3">المسار المعتاد</th>
+                <th class="py-3 px-3">الهاتف والرخصة</th>
+                <th class="py-3 px-3">اليومية (دج)</th>
+                <th class="py-3 px-3">الإضافي (دج)</th>
+                <th class="py-3 px-3 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="fleetTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         TAB 6: Customer Bookings & Overflow Dispatch
+         ============================================================ -->
+    <div id="tab-bookings" class="tab-content hidden space-y-6">
+      <!-- Top Actions Bar -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-xl font-black text-slate-900">سجل حجز المقاعد والمسافرين</h2>
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900">بوابة الزبائن المباشرة</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">متابعة تذاكر الزبائن ونسب إشغال الحافلات والتحويل التلقائي عند الامتلاء</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <a href="booking.html" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 text-white font-bold text-sm rounded-xl shadow-md transition-all">
+            <span>🚀</span>
+            <span>فتح صفحة الحجز</span>
+          </a>
+          <button id="btnCopyBookingLinkInTab" class="inline-flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-800 font-bold text-xs rounded-xl border border-slate-300 transition-all">
+            <span>📋</span>
+            <span>نسخ رابط الحجز للزبائن</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Bus Capacity & Overflow Monitor Cards -->
+      <div>
+        <h3 class="font-bold text-slate-700 text-xs uppercase tracking-wider mb-3">حالة إشغال الحافلات المخصصة للخطوط (مباشر):</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="busOccupancyCardsGrid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Bookings Table -->
+      <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <h3 class="font-black text-slate-900 text-sm">قائمة تذاكر وحجوزات المسافرين</h3>
+            <span class="text-xs text-slate-500">التحديث الفوري للحجوزات وتعيين الحافلات البديلة</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input type="text" id="filterAdminBookingSearch" placeholder="بحث باسم المسافر أو رقم الحجز..." class="px-3 py-1.5 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-right border-collapse">
+            <thead>
+              <tr class="bg-slate-100 text-slate-700 text-xs font-black uppercase tracking-wider border-b border-slate-200">
+                <th class="py-3 px-3">رقم التذكرة</th>
+                <th class="py-3 px-3">اسم المسافر</th>
+                <th class="py-3 px-3">رقم الهاتف</th>
+                <th class="py-3 px-3">مسار الرحلة</th>
+                <th class="py-3 px-3">تاريخ الرحلة</th>
+                <th class="py-3 px-3 text-center">المقاعد</th>
+                <th class="py-3 px-3 text-center">الحافلة المسندة</th>
+                <th class="py-3 px-3 text-center">حالة الحافلة</th>
+                <th class="py-3 px-3 text-center">إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="adminBookingsTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL 1: Add / Edit Trip Modal
+       ============================================================ -->
+  <div class="modal-backdrop" id="tripModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 class="text-lg font-black text-slate-900" id="tripModalTitle" data-i18n="modalNewTripTitle">تسجيل رحلة جديدة</h3>
+        <button class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" id="btnCloseTripModal">✕</button>
+      </div>
+      <form id="tripForm">
+        <div class="modal-body space-y-4">
+          <input type="hidden" id="tripIdInput" value="">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldDriver">السائق: *</label>
+              <select id="tripDriverSelect" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required></select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldBusNumber">رقم / ترقيم الحافلة:</label>
+              <input type="text" id="tripBusNumber" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثلاً: حافلة 12">
+            </div>
+          </div>
+
+          <!-- 50-Seater Large Bus Toggle -->
+          <div class="p-3 bg-blue-50/80 border border-blue-200 rounded-xl flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="tripIs50Seater" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" checked>
+              <label for="tripIs50Seater" class="text-sm font-bold text-blue-900">
+                حافلة نقل كبيرة (سعة 50 مقعد)
+              </label>
+            </div>
+            <div class="flex items-center gap-2 text-xs">
+              <span class="text-slate-600">سعة المقاعد:</span>
+              <input type="number" id="tripBusCapacity" class="w-16 px-2 py-1 text-sm border border-blue-300 rounded text-center font-bold" value="50" min="10" max="100">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldDate">تاريخ الرحلة: *</label>
+              <input type="date" id="tripDate" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldStatus">حالة الرحلة:</label>
+              <select id="tripStatus" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="completed" data-i18n="statusCompleted">مكتملة</option>
+                <option value="in_progress" data-i18n="statusInProgress">جارية الآن</option>
+                <option value="scheduled" data-i18n="statusScheduled">مجدولة</option>
+                <option value="canceled" data-i18n="statusCanceled">ملغاة</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldRoute">مسار الرحلة / اسم الخط: *</label>
+            <input type="text" id="tripRoute" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثلاً: المحطة المركزية ➔ الجامعة (خط 01)" required>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldPassengers">عدد الركاب المسجلين:</label>
+              <input type="number" id="tripPassengers" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold" min="0" value="45">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldFuel">تكلفة الوقود / المصاريف (دج):</label>
+              <input type="number" id="tripFuel" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" min="0" step="50" value="2000">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldRevenue">المداخيل / التذاكر (دج):</label>
+              <input type="number" id="tripRevenue" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono font-bold text-emerald-600" min="0" step="50" value="4500">
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-700 block mb-1" data-i18n="fieldNotes">ملاحظات إضافية:</label>
+            <textarea id="tripNotes" rows="2" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="أي ملاحظات حول الصيانة، الأعطال، الازدحام المروري..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg" id="btnCancelTripModal" data-i18n="btnCancel">إلغاء</button>
+          <button type="submit" class="px-5 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md" data-i18n="btnSave">حفظ البيانات</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 2: Add / Edit Driver Modal
+       ============================================================ -->
+  <div class="modal-backdrop" id="driversModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <h3 class="text-lg font-black text-slate-900" id="driverFormTitle" data-i18n="modalDriverTitle">إدارة بيانات السائق</h3>
+        <button class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" id="btnCloseDriversModal">✕</button>
+      </div>
+      <form id="driverForm">
+        <div class="modal-body space-y-4">
+          <input type="hidden" id="driverFormId" value="">
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">اسم السائق: *</label>
+              <input type="text" id="driverNameInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" required placeholder="مثال: أحمد بن علي">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">رقم الهاتف:</label>
+              <input type="text" id="driverPhoneInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="0550123456">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">رقم / ترقيم الحافلة المسندة:</label>
+              <input type="text" id="driverBusInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="حافلة رقم 12 (01452-116-16)">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">سعة المقاعد:</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="driverCapacityInput" class="w-24 px-3 py-2 text-sm border border-slate-300 rounded-lg text-center font-bold" value="50">
+                <label class="flex items-center gap-1.5 text-xs text-slate-700 font-semibold">
+                  <input type="checkbox" id="driverIs50Input" class="rounded text-blue-600" checked>
+                  حافلة كبيرة (50 راكب)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">حالة السائق:</label>
+              <select id="driverStatusInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <option value="active">🟢 نشط في الخدمة</option>
+                <option value="leave">🔵 في عطلة رسمية / إجازة</option>
+                <option value="suspended">🔴 موقف مؤقتاً / صيانة</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">المسار أو الخط المعتاد:</label>
+              <input type="text" id="driverRouteInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثال: خط المحطة المركزية - الجامعة">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">أجر اليومية الافتراضي (دج):</label>
+              <input type="number" id="driverDailyWageInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" min="0" value="2800" step="50">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">أجر الساعة الإضافية (دج):</label>
+              <input type="number" id="driverOvertimeRateInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none font-mono" min="0" value="450" step="50">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">صنف ورقم رخصة السياقة:</label>
+              <input type="text" id="driverLicenseInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="صنف (د - نقل عمومي)">
+            </div>
+            <div>
+              <label class="text-xs font-bold text-slate-700 block mb-1">ملاحظات حول السائق:</label>
+              <input type="text" id="driverNotesInput" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="ملاحظات الأداء، الانضباط، تاريخ التعيين...">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg" id="btnCancelEditDriver" style="display:none;" data-i18n="btnCancel">إلغاء</button>
+          <button type="button" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg" id="btnFinishDriversModal">إغلاق</button>
+          <button type="submit" class="px-5 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md" data-i18n="btnSave">حفظ السائق</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 3: Attendance Day Details Modal
+       ============================================================ -->
+  <div class="modal-backdrop" id="dayDetailsModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="text-lg font-black text-slate-900" id="modalDayTitle">تعديل بيانات اليوم</h3>
+        <button class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" id="btnCloseDayModal">✕</button>
+      </div>
+      <div class="modal-body space-y-4">
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-2">حالة الحضور والعمل:</label>
+          <div class="grid grid-cols-2 gap-2 text-xs font-bold">
+            <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="dayStatus" value="work">
+              <span class="text-emerald-700">🟢 عمل (حاضر)</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="dayStatus" value="rest">
+              <span class="text-blue-700">🔵 راحة أسبوعية</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="dayStatus" value="absence">
+              <span class="text-rose-700">🔴 غياب</span>
+            </label>
+            <label class="flex items-center gap-2 p-2.5 border rounded-lg cursor-pointer hover:bg-slate-50">
+              <input type="radio" name="dayStatus" value="leave">
+              <span class="text-amber-700">🟠 إجازة مرضية</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">ساعات أو خدمات إضافية:</label>
+          <input type="number" id="inputDayOvertime" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" min="0" step="0.5" value="0">
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">الرحلات المنفذة في هذا اليوم:</label>
+          <input type="text" id="inputDayTrips" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="مثلاً: 4 رحلات - خط الجامعة">
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-700 block mb-1">ملاحظات اليوم:</label>
+          <textarea id="inputDayNotes" rows="2" class="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="أعطال، تأخير، صيانة..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg" id="btnCancelDayModal" data-i18n="btnCancel">إلغاء</button>
+        <button type="button" class="px-5 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md" id="btnSaveDayModal" data-i18n="btnSave">حفظ التغييرات</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL 4: Quick Fill Attendance Pattern
+       ============================================================ -->
+  <div class="modal-backdrop" id="quickFillModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="text-lg font-black text-slate-900">⚡ التعبئة التلقائية لجدول الشهر</h3>
+        <button class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" id="btnCloseQuickFillModal">✕</button>
+      </div>
+      <div class="modal-body space-y-3">
+        <p class="text-xs text-slate-600">اختر نظام العمل لتطبيق أيام العمل وأيام الراحة على كامل الشهر بضغطة واحدة:</p>
+        
+        <!-- الخيار 1: يوم بيوم -->
+        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+          <input type="radio" name="fillPattern" value="one_on_one_off" checked class="mt-1">
+          <div>
+            <strong class="text-sm text-slate-800 block">1. نظام المناوبة (يوم بيوم)</strong>
+            <span class="text-xs text-slate-500">يوم عمل يليه يوم راحة أسبوعية بالتناوب طوال الشهر (1x1)</span>
+          </div>
+        </label>
+
+        <!-- الخيار 2: العمل طيلة الأسبوع مع راحة يوم الجمعة -->
+        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+          <input type="radio" name="fillPattern" value="friday_off" class="mt-1">
+          <div>
+            <strong class="text-sm text-slate-800 block">2. العمل طيلة الأسبوع مع راحة يوم الجمعة</strong>
+            <span class="text-xs text-slate-500">السبت إلى الخميس: عمل | الجمعة: راحة أسبوعية</span>
+          </div>
+        </label>
+
+        <!-- الخيار 3: يومان عمل ثم يوم راحة -->
+        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+          <input type="radio" name="fillPattern" value="two_on_one_off" class="mt-1">
+          <div>
+            <strong class="text-sm text-slate-800 block">3. نظام المناوبة (يومان عمل ثم يوم راحة - 2x1)</strong>
+            <span class="text-xs text-slate-500">يومان عمل متتاليان ثم يوم راحة بالتناوب طوال الشهر</span>
+          </div>
+        </label>
+
+        <!-- الخيار 4: يوم عمل ويومان راحة -->
+        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+          <input type="radio" name="fillPattern" value="one_on_two_off" class="mt-1">
+          <div>
+            <strong class="text-sm text-slate-800 block">4. نظام المناوبة (يوم عمل ويومان راحة - 1x2)</strong>
+            <span class="text-xs text-slate-500">يوم عمل واحد يليه يومان راحة بالتناوب طوال الشهر</span>
+          </div>
+        </label>
+
+        <!-- الخيار 5: عمل كل الشهر -->
+        <label class="flex items-start gap-3 p-3 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-50 transition-colors">
+          <input type="radio" name="fillPattern" value="all_work" class="mt-1">
+          <div>
+            <strong class="text-sm text-slate-800 block">5. عمل كل الشهر</strong>
+            <span class="text-xs text-slate-500">جميع أيام الشهر عمل بدون عطلة افتراضية (يمكن التعديل يدوياً)</span>
+          </div>
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-lg" id="btnCancelQuickFill" data-i18n="btnCancel">إلغاء</button>
+        <button type="button" class="px-5 py-2 text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md" id="btnApplyQuickFill">تطبيق على هذا الشهر</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PRINT AREA (Visible only when printing PDF)
+       ============================================================ -->
+  <div id="printArea" class="print-container">
+    <div class="print-header">
+      <div>
+        <h2 style="font-size: 16pt; font-weight: bold;">مؤسسة النقل الحضري وشبه الحضري</h2>
+        <p style="font-size: 10pt; color: #555;">مصلحة الاستغلال والموارد البشرية</p>
+      </div>
+      <div style="text-align: center;">
+        <h1 style="font-size: 18pt; font-weight: 900;">كشف أيام العمل والمستحقات الشهرية</h1>
+        <p id="printMonthYear" style="font-weight: bold; font-size: 11pt;">شهر: --</p>
+      </div>
+      <div style="text-align: left; font-size: 9pt;">
+        تاريخ الإصدار: <span id="printCurrentDate">--</span>
+      </div>
+    </div>
+
+    <div style="border: 1px solid #333; padding: 10px; margin-bottom: 15px; font-size: 10pt; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+      <div><strong>اسم السائق:</strong> <span id="printDriverName">--</span></div>
+      <div><strong>رقم / ترقيم الحافلة:</strong> <span id="printBusNumber">--</span></div>
+      <div><strong>الهاتف:</strong> <span id="printDriverPhone">--</span></div>
+      <div><strong>أجر اليومية:</strong> <span id="printDailyWage">0</span></div>
+      <div><strong>أجر الساعة الإضافية:</strong> <span id="printOvertimeRate">0</span></div>
+      <div><strong>نظام العمل:</strong> سائق حافلة خطوط منتظمة</div>
+    </div>
+
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th style="width: 40px;">اليوم</th>
+          <th style="width: 80px;">اليوم</th>
+          <th style="width: 90px;">الحالة</th>
+          <th style="width: 70px;">إضافي</th>
+          <th>الرحلات / الخطوط</th>
+          <th>ملاحظات</th>
+        </tr>
+      </thead>
+      <tbody id="printTableBody"></tbody>
+    </table>
+
+    <div class="print-summary-box">
+      <div style="width: 48%;">
+        <table style="width: 100%; font-size: 10pt;">
+          <tr>
+            <td>إجمالي أيام العمل الفعلية:</td>
+            <td><strong id="printSumWorkDays">0</strong> يوم</td>
+          </tr>
+          <tr>
+            <td>إجمالي أيام الراحة:</td>
+            <td><span id="printSumRestDays">0</span> يوم</td>
+          </tr>
+          <tr>
+            <td>إجمالي أيام الغياب:</td>
+            <td><span id="printSumAbsenceDays">0</span> يوم</td>
+          </tr>
+          <tr>
+            <td>إجمالي الساعات الإضافية:</td>
+            <td><span id="printSumOvertime">0</span> ساعة</td>
+          </tr>
+        </table>
+      </div>
+      <div style="width: 48%;">
+        <table style="width: 100%; font-size: 10pt;">
+          <tr>
+            <td>المستحقات الأساسية:</td>
+            <td><span id="printSumBaseSalary">0</span></td>
+          </tr>
+          <tr>
+            <td>مستحقات الإضافي:</td>
+            <td><span id="printSumOvertimeSalary">0</span></td>
+          </tr>
+          <tr>
+            <td>المكافآت / البدلات:</td>
+            <td><span id="printSumBonus">0</span></td>
+          </tr>
+          <tr>
+            <td>الخصومات / السلف:</td>
+            <td><span id="printSumDeductions">0</span></td>
+          </tr>
+          <tr style="border-top: 1px solid #333; font-weight: bold; font-size: 11pt;">
+            <td>المبلغ الصافي المستحق:</td>
+            <td><strong id="printSumNetTotal">0</strong></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="print-signatures">
+      <div class="signature-box">توقيع السائق</div>
+      <div class="signature-box">مسؤول الحركة والاستغلال</div>
+      <div class="signature-box">موافقة الإدارة والمحاسبة</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       Android Mobile Bottom Navigation Bar (Material 3 Style)
+       ============================================================ -->
+  <nav class="md:hidden fixed bottom-0 inset-x-0 bg-white/95 backdrop-blur-md border-t border-slate-200 z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] px-1 py-1 flex items-center justify-around no-print safe-area-pb">
+    <button class="android-bottom-nav-btn active flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="dashboard">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">📊</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">الرئيسية</span>
+    </button>
+    <button class="android-bottom-nav-btn flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="trips">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">📋</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">الرحلات</span>
+    </button>
+    <button class="android-bottom-nav-btn flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="attendance">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">📅</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">الحضور</span>
+    </button>
+    <button class="android-bottom-nav-btn flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="bookings">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">🎫</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">الحجوزات</span>
+    </button>
+    <button class="android-bottom-nav-btn flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="fleet">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">👥</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">الأسطول</span>
+    </button>
+    <button class="android-bottom-nav-btn flex flex-col items-center justify-center flex-1 py-1.5 px-0.5 rounded-2xl text-slate-500 hover:text-blue-700 transition-all select-none" data-tab="reports">
+      <span class="android-nav-icon text-xl flex items-center justify-center w-10 h-7 rounded-full">📈</span>
+      <span class="text-[10px] font-bold mt-0.5 text-slate-600">التقارير</span>
+    </button>
+  </nav>
+
+  <!-- Android Floating Action Button (FAB) on Mobile Screens -->
+  <button id="androidFabAddTrip" class="md:hidden fixed bottom-18 start-4 z-40 w-13 h-13 bg-gradient-to-tr from-blue-700 to-indigo-600 text-white rounded-2xl shadow-xl flex items-center justify-center text-2xl hover:scale-105 active:scale-90 transition-all no-print border border-white/20" title="تسجيل رحلة جديدة" aria-label="تسجيل رحلة جديدة">
+    ➕
+  </button>
+
+  <!-- ============================================================
+       MODAL 5: Booking Portal Share & Information Modal
+       ============================================================ -->
+  <div class="modal-backdrop" id="bookingModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">🎫</span>
+          <h3 class="text-lg font-black text-slate-900">بوابة حجز التذاكر للزبائن</h3>
+        </div>
+        <button class="text-slate-400 hover:text-slate-700 text-xl font-bold p-1" id="btnCloseBookingModal">✕</button>
+      </div>
+      <div class="modal-body space-y-4">
+        <div class="p-4 bg-gradient-to-r from-blue-900 to-indigo-800 text-white rounded-2xl shadow-sm">
+          <h4 class="font-black text-base">مؤسسة سويقات أبو طالب للنقل</h4>
+          <p class="text-xs text-blue-100 mt-1">
+            رابط مباشر مخصص لركاب وزبائن المؤسسة لحجز المقاعد مسبقاً وتأكيد التذاكر الإلكترونية مع خاصية التحويل التلقائي عند الامتلاء.
+          </p>
+        </div>
+
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <span class="text-xs font-bold text-slate-600 block">رابط الحجز المباشر للزبائن (شاركه مع الركاب):</span>
+          <div class="flex items-center gap-2">
+            <input type="text" id="inputPublicBookingUrl" readonly class="w-full px-3 py-2 text-xs font-mono bg-white border border-slate-300 rounded-lg text-blue-700 font-bold select-all" dir="ltr" value="booking.html">
+            <button id="btnCopyBookingUrlModal" class="px-3 py-2 text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg whitespace-nowrap shadow-xs transition-all">
+              📋 نسخ
+            </button>
+          </div>
+        </div>
+
+        <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-950 space-y-1.5 leading-relaxed">
+          <div class="flex items-center gap-2 font-black text-amber-900">
+            <span>⚡</span>
+            <span>خوارزمية الحافلة الممتلئة (Automated Overflow):</span>
+          </div>
+          <p>
+            عندما تمتلئ مقاعد الحافلة الأساسية المخصصة للخط (50 مقعداً)، يظهر للراكب تنبيه فوري:
+            <br>
+            <strong class="text-rose-700">«الحافلة رقم (12) ممتلئة تماماً، سيتم الحجز في الحافلة رقم (08)»</strong>
+            ويتم تسجيل التذكرة في الحافلة البديلة تلقائياً.
+          </p>
+        </div>
+      </div>
+      <div class="modal-footer flex items-center justify-between">
+        <a href="booking.html" target="_blank" class="px-4 py-2 text-xs font-bold bg-blue-700 hover:bg-blue-800 text-white rounded-xl shadow-xs transition-all flex items-center gap-1.5">
+          <span>🚀</span>
+          <span>فتح بوابة الحجز الآن</span>
+        </a>
+        <button type="button" class="px-4 py-2 text-xs font-bold bg-slate-200 hover:bg-slate-300 text-slate-800 rounded-xl" id="btnFinishBookingModal">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div id="toastContainer"></div>
+
+  <!-- Core JavaScript -->
+  <script src="app.js"></script>
+</body>
+</html>

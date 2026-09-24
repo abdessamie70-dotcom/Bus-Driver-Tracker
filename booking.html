@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة حجز المقاعد والرحلات | مؤسسة سويقات أبو طالب</title>
+  <meta name="description" content="البوابة الإلكترونية الرسمية لحجز مقاعد ورحلات حافلات مؤسسة سويقات أبو طالب">
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="حجز سويقات">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Font Cairo -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Cairo', system-ui, -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+    @media print {
+      .no-print { display: none !important; }
+      .print-only { display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-blue-600 selection:text-white">
+
+  <!-- ============================================================
+       Header
+       ============================================================ -->
+  <header class="bg-gradient-to-r from-blue-950 via-blue-900 to-indigo-950 text-white shadow-lg sticky top-0 z-30 no-print">
+    <div class="max-w-4xl mx-auto px-4 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-11 h-11 bg-white/10 rounded-2xl flex items-center justify-center text-2xl shadow-inner border border-white/20">
+          🚌
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="text-lg font-black tracking-tight">مؤسسة سويقات أبو طالب</h1>
+            <span class="text-[10px] font-bold bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full shadow-xs">
+              بوابة الحجز المباشر
+            </span>
+          </div>
+          <p class="text-xs text-blue-200">حجز مقاعد الحافلات وتأكيد التذاكر الإلكترونية</p>
+        </div>
+      </div>
+
+      <a href="index.html" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold bg-white/10 hover:bg-white/20 rounded-xl border border-white/20 transition-all text-white">
+        ⚙️ لوحة الإدارة
+      </a>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       Main Content
+       ============================================================ -->
+  <main class="max-w-4xl mx-auto px-4 py-6 w-full flex-1">
+
+    <!-- Active Step 1: Booking Form -->
+    <div id="bookingFormSection" class="space-y-6">
+      
+      <!-- Welcome Banner -->
+      <div class="bg-gradient-to-r from-blue-900 to-indigo-800 text-white p-6 rounded-3xl shadow-md relative overflow-hidden">
+        <div class="absolute -end-10 -bottom-10 opacity-10 text-9xl font-black select-none">
+          🎫
+        </div>
+        <div class="relative z-10 max-w-xl">
+          <span class="inline-block text-xs font-bold bg-blue-500/40 text-blue-200 px-3 py-1 rounded-full mb-2">
+            خدمة النقل المنتظم والرحلات اليومية
+          </span>
+          <h2 class="text-2xl font-black">احجز تذكرتك ومقعدك الآن بسهولة</h2>
+          <p class="text-sm text-blue-100 mt-1 leading-relaxed">
+            اختر خط الرحلة وتاريخ السفر، وسيقوم النظام بتأمين مقعدك تلقائياً في الحافلة المتاحة. في حالة امتلاء الحافلة الأولى، يتم تحويل الحجز فورياً للحافلة التالية!
+          </p>
+        </div>
+      </div>
+
+      <!-- Main Booking Card -->
+      <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8">
+        <h3 class="text-lg font-black text-slate-900 mb-6 flex items-center gap-2">
+          <span>📝</span>
+          <span>بيانات حجز الرحلة</span>
+        </h3>
+
+        <form id="passengerBookingForm" class="space-y-5">
+          
+          <!-- Line / Route Selector -->
+          <div>
+            <label for="routeSelect" class="block text-xs font-black text-slate-700 mb-2">
+              مسار الرحلة / الخط: *
+            </label>
+            <select id="routeSelect" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <!-- Real-Time Bus Status Indicator (Overflow Logic Trigger) -->
+          <div id="busStatusBanner" class="p-4 rounded-2xl border transition-all">
+            <!-- Dynamically populated status -->
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Trip Date -->
+            <div>
+              <label for="tripDateInput" class="block text-xs font-black text-slate-700 mb-2">
+                تاريخ الرحلة: *
+              </label>
+              <input type="date" id="tripDateInput" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all">
+            </div>
+
+            <!-- Number of Seats -->
+            <div>
+              <label for="seatsInput" class="block text-xs font-black text-slate-700 mb-2">
+                عدد المقاعد المطلوبة: *
+              </label>
+              <select id="seatsInput" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all">
+                <option value="1">مقعد واحد (1)</option>
+                <option value="2">مقعدان (2)</option>
+                <option value="3">3 مقاعد</option>
+                <option value="4">4 مقاعد</option>
+                <option value="5">5 مقاعد</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Passenger Name -->
+            <div>
+              <label for="passengerNameInput" class="block text-xs font-black text-slate-700 mb-2">
+                اسم المسافر الكامل: *
+              </label>
+              <input type="text" id="passengerNameInput" required placeholder="مثال: محمد العمري" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all">
+            </div>
+
+            <!-- Phone Number -->
+            <div>
+              <label for="passengerPhoneInput" class="block text-xs font-black text-slate-700 mb-2">
+                رقم الهاتف للتواصل: *
+              </label>
+              <input type="tel" id="passengerPhoneInput" required placeholder="05 / 06 / 07 XX XX XX XX" dir="ltr" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none text-right transition-all">
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div>
+            <label for="passengerNotesInput" class="block text-xs font-black text-slate-700 mb-2">
+              ملاحظات إضافية أو مكان الصعود (اختياري):
+            </label>
+            <input type="text" id="passengerNotesInput" placeholder="مثال: نقطة الصعود عند مفترق الطرق المركزي" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl text-sm font-semibold focus:ring-2 focus:ring-blue-500 focus:bg-white focus:outline-none transition-all">
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-4">
+            <button type="submit" id="btnSubmitBooking" class="w-full py-4 bg-gradient-to-r from-blue-700 to-indigo-700 hover:from-blue-800 hover:to-indigo-800 active:scale-[0.99] text-white font-black text-base rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2">
+              <span>🎟️</span>
+              <span id="btnSubmitText">تأكيد الحجز وإصدار التذكرة</span>
+            </button>
+            <p class="text-center text-xs text-slate-500 mt-2">
+              * يتم حجز المقعد فوريًا وحفظه في سجل رحلات مؤسسة سويقات أبو طالب
+            </p>
+          </div>
+
+        </form>
+      </div>
+
+    </div>
+
+    <!-- Active Step 2: Digital Ticket & Confirmation (Hidden initially) -->
+    <div id="bookingConfirmationSection" class="hidden space-y-6">
+      
+      <!-- Success Badge -->
+      <div class="bg-emerald-500 text-white p-5 rounded-3xl shadow-sm flex items-center gap-3">
+        <span class="text-3xl">✅</span>
+        <div>
+          <h3 class="text-lg font-black">تم تأكيد حجزك بنجاح!</h3>
+          <p class="text-xs text-emerald-100 mt-0.5">تم تسجيل تذكرتك رسمياً لدى مؤسسة سويقات أبو طالب للنقل.</p>
+        </div>
+      </div>
+
+      <!-- Overflow Note if Applicable -->
+      <div id="ticketOverflowNotice" class="hidden p-4 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-900 text-sm font-bold flex items-center gap-3">
+        <span class="text-2xl">⚠️</span>
+        <div id="ticketOverflowNoticeText">
+          نظراً لاكتمال مقاعد الحافلة الأساسية، تم تخصيص وتأكيد مقعدك في الحافلة رقم ...
+        </div>
+      </div>
+
+      <!-- Printable Digital Ticket Card -->
+      <div class="bg-white rounded-3xl border-2 border-dashed border-slate-300 shadow-md p-6 sm:p-8 relative overflow-hidden" id="printableTicket">
+        
+        <!-- Ticket Header -->
+        <div class="flex items-center justify-between pb-6 border-b border-slate-200 flex-wrap gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 bg-blue-900 text-white rounded-2xl flex items-center justify-center text-2xl font-black">
+              🚌
+            </div>
+            <div>
+              <h4 class="text-base font-black text-slate-900">مؤسسة سويقات أبو طالب للنقل</h4>
+              <p class="text-xs text-slate-500">تذكرة صعود وحجز إلكترونية مؤكدة</p>
+            </div>
+          </div>
+
+          <div class="text-left">
+            <span class="text-xs text-slate-400 font-bold block">رقم الحجز:</span>
+            <span class="font-mono text-xl font-black text-blue-700 tracking-wider" id="ticketBookingCode">BK-0000</span>
+          </div>
+        </div>
+
+        <!-- Ticket Details Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 py-6 border-b border-slate-200">
+          <div>
+            <span class="text-xs text-slate-400 font-bold block">اسم المسافر:</span>
+            <strong class="text-base text-slate-800 block mt-1" id="ticketPassengerName">-</strong>
+          </div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block">رقم الهاتف:</span>
+            <strong class="text-base text-slate-800 font-mono block mt-1" id="ticketPassengerPhone">-</strong>
+          </div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block">تاريخ الرحلة:</span>
+            <strong class="text-base text-slate-800 block mt-1" id="ticketDate">-</strong>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-xs text-slate-400 font-bold block">مسار الرحلة / الخط:</span>
+            <strong class="text-base text-blue-900 block mt-1" id="ticketRoute">-</strong>
+          </div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block">الحافلة المخصصة:</span>
+            <div class="flex items-center gap-2 mt-1">
+              <strong class="text-lg text-emerald-700 font-black" id="ticketBusNumber">-</strong>
+              <span id="ticketBusTypeBadge" class="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-md font-bold">50 مقعد</span>
+            </div>
+          </div>
+          <div>
+            <span class="text-xs text-slate-400 font-bold block">عدد المقاعد:</span>
+            <strong class="text-base text-slate-800 block mt-1" id="ticketSeatsCount">1 مقعد</strong>
+          </div>
+          <div class="sm:col-span-2">
+            <span class="text-xs text-slate-400 font-bold block">ملاحظات المسافر / مكان الركوب:</span>
+            <span class="text-sm text-slate-600 block mt-1" id="ticketNotes">لا توجد ملاحظات</span>
+          </div>
+        </div>
+
+        <!-- Ticket Footer Instructions -->
+        <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <p>
+            📍 يرجى التواجد في محطة الانطلاق قبل الموعد بـ 15 دقيقة وإبراز هذه التذكرة أو رقم الحجز لسائق الحافلة.
+          </p>
+          <span class="font-mono text-slate-400" id="ticketTimestamp">--</span>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-center gap-3 flex-wrap no-print">
+        <button id="btnPrintTicket" class="px-6 py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center gap-2">
+          <span>🖨️</span>
+          <span>طباعة التذكرة / حفظ كـ PDF</span>
+        </button>
+        <button id="btnNewBooking" class="px-6 py-3 bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold text-sm rounded-xl transition-all flex items-center gap-2">
+          <span>➕</span>
+          <span>إجراء حجز آخر</span>
+        </button>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       Footer
+       ============================================================ -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500 no-print">
+    <div class="max-w-4xl mx-auto px-4">
+      نظام الحجز الآلي • <strong>مؤسسة سويقات أبو طالب للنقل</strong> • جميع الحقوق محفوظة © 2026
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       Booking System Core Logic
+       ============================================================ -->
+  <script>
+    // Initial Setup and Mock Database
+    const DEFAULT_ROUTES = [
+      { id: "route_1", name: "الخط 01: المحطة المركزية ➔ الجامعة المركزية", primaryBus: "12", overflowBus: "08", capacity: 50 },
+      { id: "route_2", name: "الخط 02: وسط المدينة ➔ حي النور", primaryBus: "08", overflowBus: "19", capacity: 50 },
+      { id: "route_3", name: "الخط 03: المطار الدولي ➔ محطة الحافلات الكبرى", primaryBus: "19", overflowBus: "12", capacity: 50 },
+      { id: "route_4", name: "الخط 04: خط النقل التكميلي - الضواحي", primaryBus: "04", overflowBus: "12", capacity: 30 }
+    ];
+
+    let availableRoutes = DEFAULT_ROUTES;
+    let bookings = [];
+
+    // Load Data from LocalStorage
+    function loadBookingData() {
+      try {
+        const savedBookings = localStorage.getItem("bus_tracker_bookings");
+        if (savedBookings) {
+          bookings = JSON.parse(savedBookings);
+        } else {
+          // Sample Seed Bookings (to demonstrate overflow immediately on route 1)
+          const today = new Date().toISOString().slice(0, 10);
+          bookings = [
+            // 48 seats already booked on Bus 12 for today
+            {
+              id: "BK-101",
+              name: "فوج طلبة الجامعة",
+              phone: "0550112233",
+              routeId: "route_1",
+              routeName: "الخط 01: المحطة المركزية ➔ الجامعة المركزية",
+              date: today,
+              seats: 48,
+              assignedBus: "12",
+              isOverflow: false,
+              notes: "حجز جماعي مسبق",
+              timestamp: new Date().toLocaleString('ar-DZ')
+            }
+          ];
+          saveBookings();
+        }
+
+        // Try to load custom routes / drivers from admin tracker if available
+        const savedDrivers = localStorage.getItem("bus_tracker_drivers");
+        if (savedDrivers) {
+          const drivers = JSON.parse(savedDrivers);
+          if (drivers && drivers.length > 0) {
+            // Match configured routes
+            const customRoutes = [];
+            drivers.forEach((d, idx) => {
+              const rName = d.route || `الخط ${idx + 1}: مسار الحافلة ${d.busNumber}`;
+              const nextDriver = drivers[(idx + 1) % drivers.length];
+              customRoutes.push({
+                id: `route_${d.id}`,
+                name: rName,
+                primaryBus: d.busNumber || `${idx + 1}`,
+                overflowBus: nextDriver.busNumber || "19",
+                capacity: d.capacity || 50
+              });
+            });
+            if (customRoutes.length > 0) {
+              availableRoutes = customRoutes;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Booking load error:", e);
+      }
+    }
+
+    function saveBookings() {
+      localStorage.setItem("bus_tracker_bookings", JSON.stringify(bookings));
+    }
+
+    // Populate Routes Dropdown
+    function populateRoutes() {
+      const select = document.getElementById("routeSelect");
+      select.innerHTML = "";
+      availableRoutes.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        opt.textContent = `${r.name} (حافلة ${r.primaryBus})`;
+        select.appendChild(opt);
+      });
+    }
+
+    // Calculate Currently Booked Seats for a Given Route, Date and Bus
+    function getBookedSeats(routeId, date, busNumber) {
+      return bookings
+        .filter(b => b.routeId === routeId && b.date === date && b.assignedBus === busNumber)
+        .reduce((sum, b) => sum + (Number(b.seats) || 1), 0);
+    }
+
+    // Real-Time Bus Status and Overflow Evaluation
+    function updateBusStatusBanner() {
+      const routeId = document.getElementById("routeSelect").value;
+      const date = document.getElementById("tripDateInput").value;
+      const requestedSeats = Number(document.getElementById("seatsInput").value) || 1;
+      const banner = document.getElementById("busStatusBanner");
+      const submitText = document.getElementById("btnSubmitText");
+
+      const route = availableRoutes.find(r => r.id === routeId) || availableRoutes[0];
+      if (!route) return;
+
+      const primaryBooked = getBookedSeats(route.id, date, route.primaryBus);
+      const primaryRemaining = Math.max(0, route.capacity - primaryBooked);
+
+      // Check if primary bus can accommodate the requested seats
+      if (primaryBooked >= route.capacity || requestedSeats > primaryRemaining) {
+        // OVERFLOW TRIGGER: Primary bus is full!
+        const overflowBooked = getBookedSeats(route.id, date, route.overflowBus);
+        const overflowCapacity = 50;
+        const overflowRemaining = Math.max(0, overflowCapacity - overflowBooked);
+
+        banner.className = "p-4 rounded-2xl border-2 border-amber-300 bg-amber-50 text-amber-950 transition-all";
+        banner.innerHTML = `
+          <div class="flex items-start gap-3">
+            <span class="text-2xl shrink-0">⚠️</span>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-black text-amber-900 text-sm">الحافلة الأساسية رقم (${route.primaryBus}) ممتلئة!</span>
+                <span class="text-xs bg-rose-100 text-rose-800 px-2 py-0.5 rounded-full font-bold">نسبة الامتلاء: ${primaryBooked}/${route.capacity} مقعد</span>
+              </div>
+              <p class="text-xs font-bold text-amber-900 leading-relaxed">
+                👉 <strong>سيتم تأكيد حجزك تلقائياً في الحافلة البديلة رقم (${route.overflowBus})</strong> المجهزة بسعة 50 مقعد (المتبقي فيها: ${overflowRemaining} مقعد).
+              </p>
+            </div>
+          </div>
+        `;
+        submitText.textContent = `تأكيد الحجز في الحافلة البديلة (${route.overflowBus})`;
+      } else {
+        // Primary bus has available seats
+        banner.className = "p-4 rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-950 transition-all";
+        banner.innerHTML = `
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">🟢</span>
+              <div>
+                <span class="font-black text-emerald-900 text-sm">مقاعد متوفرة في الحافلة الأساسية رقم (${route.primaryBus})</span>
+                <span class="text-xs text-emerald-700 block mt-0.5">الحافلة جاهزة - المتبقي: <strong>${primaryRemaining}</strong> من أصل ${route.capacity} مقعد</span>
+              </div>
+            </div>
+            <span class="text-xs font-bold bg-emerald-200 text-emerald-900 px-2.5 py-1 rounded-lg">
+              حجز مؤكد
+            </span>
+          </div>
+        `;
+        submitText.textContent = `تأكيد الحجز في الحافلة (${route.primaryBus})`;
+      }
+    }
+
+    // Handle Form Submit
+    function handleBookingSubmit(e) {
+      e.preventDefault();
+
+      const routeId = document.getElementById("routeSelect").value;
+      const date = document.getElementById("tripDateInput").value;
+      const seats = Number(document.getElementById("seatsInput").value) || 1;
+      const passengerName = document.getElementById("passengerNameInput").value.trim();
+      const passengerPhone = document.getElementById("passengerPhoneInput").value.trim();
+      const notes = document.getElementById("passengerNotesInput").value.trim();
+
+      if (!routeId || !date || !passengerName || !passengerPhone) {
+        alert("يرجى ملء كافة الحقول الإلزامية.");
+        return;
+      }
+
+      const route = availableRoutes.find(r => r.id === routeId) || availableRoutes[0];
+      const primaryBooked = getBookedSeats(route.id, date, route.primaryBus);
+      const primaryRemaining = Math.max(0, route.capacity - primaryBooked);
+
+      let assignedBus = route.primaryBus;
+      let isOverflow = false;
+
+      // Overflow Decision
+      if (primaryBooked >= route.capacity || seats > primaryRemaining) {
+        assignedBus = route.overflowBus;
+        isOverflow = true;
+      }
+
+      const bookingCode = "BK-" + Math.floor(10000 + Math.random() * 90000);
+      const timestamp = new Date().toLocaleString('ar-DZ');
+
+      const newBooking = {
+        id: bookingCode,
+        name: passengerName,
+        phone: passengerPhone,
+        routeId: route.id,
+        routeName: route.name,
+        date: date,
+        seats: seats,
+        assignedBus: assignedBus,
+        originalBus: route.primaryBus,
+        isOverflow: isOverflow,
+        notes: notes || "لا توجد ملاحظات",
+        timestamp: timestamp
+      };
+
+      bookings.unshift(newBooking);
+      saveBookings();
+
+      // Display Confirmation & Ticket
+      renderTicket(newBooking);
+    }
+
+    function renderTicket(b) {
+      document.getElementById("bookingFormSection").classList.add("hidden");
+      document.getElementById("bookingConfirmationSection").classList.remove("hidden");
+
+      document.getElementById("ticketBookingCode").textContent = b.id;
+      document.getElementById("ticketPassengerName").textContent = b.name;
+      document.getElementById("ticketPassengerPhone").textContent = b.phone;
+      document.getElementById("ticketDate").textContent = b.date;
+      document.getElementById("ticketRoute").textContent = b.routeName;
+      document.getElementById("ticketBusNumber").textContent = `حافلة رقم ${b.assignedBus}`;
+      document.getElementById("ticketSeatsCount").textContent = `${b.seats} مقعد`;
+      document.getElementById("ticketNotes").textContent = b.notes;
+      document.getElementById("ticketTimestamp").textContent = `توقيت الإصدار: ${b.timestamp}`;
+
+      const overflowNotice = document.getElementById("ticketOverflowNotice");
+      const overflowText = document.getElementById("ticketOverflowNoticeText");
+      if (b.isOverflow) {
+        overflowNotice.classList.remove("hidden");
+        overflowText.innerHTML = `⚠️ <strong>تنبيه نقل الحافلة:</strong> نظراً لاكتمال مقاعد الحافلة الأساسية رقم (${b.originalBus})، تم تحويل وتأكيد حجزك في <strong>الحافلة البديلة رقم (${b.assignedBus})</strong>!`;
+      } else {
+        overflowNotice.classList.add("hidden");
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Reset Form for New Booking
+    function resetToNewBooking() {
+      document.getElementById("passengerBookingForm").reset();
+      document.getElementById("tripDateInput").value = new Date().toISOString().slice(0, 10);
+      document.getElementById("bookingConfirmationSection").classList.add("hidden");
+      document.getElementById("bookingFormSection").classList.remove("hidden");
+      updateBusStatusBanner();
+    }
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", () => {
+      loadBookingData();
+      populateRoutes();
+
+      const today = new Date().toISOString().slice(0, 10);
+      document.getElementById("tripDateInput").value = today;
+
+      // Event Listeners
+      document.getElementById("routeSelect").addEventListener("change", updateBusStatusBanner);
+      document.getElementById("tripDateInput").addEventListener("change", updateBusStatusBanner);
+      document.getElementById("seatsInput").addEventListener("change", updateBusStatusBanner);
+      document.getElementById("passengerBookingForm").addEventListener("submit", handleBookingSubmit);
+      document.getElementById("btnPrintTicket").addEventListener("click", () => window.print());
+      document.getElementById("btnNewBooking").addEventListener("click", resetToNewBooking);
+
+      updateBusStatusBanner();
+    });
+  </script>
+</body>
+</html>
